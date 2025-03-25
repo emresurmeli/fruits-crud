@@ -21,10 +21,19 @@ fruitsRouter.get("/fruits/:id/edit", async (req, res) => {
 });
 
 fruitsRouter.get("/fruits/:id", async (req, res) => {
-  const { id } = req.params;
-  const fruit = await Fruit.findById(id);
+  try {
+    const { id } = req.params;
+    const fruit = await Fruit.findById(id);
 
-  res.render("fruits/show", { fruit });
+    res.render("fruits/show", { fruit });
+  } catch (error) {
+    console.error(error);
+    let message = error.message;
+    if (message.includes("ObjectId")) {
+      message = "This fruit doesn't exist";
+    }
+    res.render("fruits/error", { message });
+  }
 });
 
 // Get all fruits
@@ -35,17 +44,26 @@ fruitsRouter.get("/fruits", async (req, res) => {
 
 // Create a fruit
 fruitsRouter.post("/fruits", async (req, res) => {
-  let { name, isReadyToEat } = req.body;
+  try {
+    let { name, isReadyToEat } = req.body;
 
-  if (isReadyToEat) {
-    isReadyToEat = true;
-  } else {
-    isReadyToEat = false;
+    if (!name) {
+      throw new Error("Field 'name' is required");
+    }
+
+    if (isReadyToEat) {
+      isReadyToEat = true;
+    } else {
+      isReadyToEat = false;
+    }
+
+    const fruit = await Fruit.create({ name, isReadyToEat });
+
+    res.redirect("/fruits");
+  } catch (error) {
+    console.error(error);
+    res.render("fruits/error", { message: error.message })
   }
-
-  const fruit = await Fruit.create({ name, isReadyToEat });
-
-  res.redirect("/fruits");
 });
 
 fruitsRouter.put("/fruits/:id", async (req, res) => {

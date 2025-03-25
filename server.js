@@ -17,6 +17,11 @@ app.set("view engine", "ejs");
 // Routes
 app.use("/", fruitsRouter);
 
+// Error handler route
+app.use("*", (req, res) => {
+  res.render("error", { message: "Page doesn't exist" });
+});
+
 app.listen(PORT, () => {
   console.log(`App is running on port: ${PORT}`);
 });
