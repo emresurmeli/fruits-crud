@@ -4,12 +4,19 @@ import Fruit from "../models/fruit.js";
 const fruitsRouter = Router();
 
 fruitsRouter.get("/", (req, res) => {
-  res.render("index")
-})
+  res.render("index");
+});
 
 // Get the create form
 fruitsRouter.get("/fruits/new", (req, res) => {
   res.render("fruits/new");
+});
+
+fruitsRouter.get("/fruits/:id", async (req, res) => {
+  const { id } = req.params;
+  const fruit = await Fruit.findById(id);
+
+  res.render("fruits/show", { fruit });
 });
 
 // Get all fruits
